@@ -6,5 +6,8 @@ Webサイトを作るために必要な機能（ログイン機能、データ�
 
 VanillaJS:
 
-
 CSRF攻撃
+
+SQLインジェクション:
+
+セッションハイジャック（Session Hijacking）:
