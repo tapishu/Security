@@ -5,6 +5,9 @@ note_list[-10:] は、
 global:
 global note_listを関数内に書くことによって関数外の変数を編集できる
 
+with transaction.atomic(): 
+「すべて成功するか、すべて無かったことにするか（オール・イン・オル）の保証」
+
 python3 manage.py runserver:
 開発用のWebサーバーを起動するコマンドで
 
@@ -20,3 +23,46 @@ f"session-{i}" :
 
 データベース上の % :
 なんでもありのワイルドカード
+
+.format():
+text = "{}さんは{}歳です。".format("佐藤", 25) 中に当てはめる
+
+.split('/')[-1]:
+f.data.name は user_1/document.pdf
+f.data.name.split('/')[-1]は中身を/で割り、最後のやつを抽出
+
+
+safety:
+Pythonプロジェクトで使っているライブラリ（パッケージ）や、パソコンにインストールされているパッケージの中に、
+「既知のセキュリティ脆弱性（危ないバグ）」が含まれていないかを自動でスキャン・検出するコマンドラインツール.
+ターミナルで safety check などのコマンドを実行すると、今自分の環境にあるパッケージと既知の脆弱性リストを照らし合わせて、
+「おっと、このライブラリは古いバージョンだから危ないよ！」と警告を出してくれます。
+
+safety-db:
+safety というツール自身は、「どのパッケージが危ないか」という知識を最初から全部覚えているわけではありません。
+その「どのバージョンにどんな脆弱性があるか」という情報をすべて集めて、厳選してリスト化しているJSONファイルの集まり（＝データベース）が safety-db
+
+BeautifulSoup:
+「PythonでWebページのHTML（中身のソースコード）をカンタンに解剖・調査するための超便利なお助けツール（ライブラリ）」
+request.get().textで取得したhtmlは平文になるが、
+soup = bs.BeautifulSoup(response.text, 'html.parser') で取得すると構造の状態で取得可能
+---
+    soup = bs.Beaut　ifulSoup(response.text, 'html.parser')
+    # titleのタグを中身をみてSite~で始まってるかをチェック
+    return soup.title.text.startswith('Site administration')
+---
+
+ログイン時のセッションとCSRFトークン:
+#ログイン画面についた時にクッキーとCSRFトークンとそのひもづきが生成される。(どちらもバックエンドで発行される)
+# ログイン時に同時にそのクッキーを送ることでパスワードのチェック以外にもCSRFトークンとクッキーの合致も調べる。
+# 両方がパスしたら認証されたクッキーを取得できる 
+
+HTMLファイルの中に {% csrf_token %} と書いておくだけで、Djangoが画面（HTML）を生成してブラウザに送るときに、自動的に「隠しフォーム（hidden input）」へと魔法のように変換してくれるんだよ
+
+session = requests.Session() :
+一言でいうと「自動でCookie（クッキー）のやり取りや管理をぜんぶ裏でやってくれる、専用の『ブラウザの箱（セッション）』を作る命令」
+requests.get() や requests.post() は、「毎回まったく記憶喪失になる（使い捨ての）通信」
+response = requests.get(url) でアクセスする ＝ 「はじめましての人」としてページを開く。サーバーから「Cookie（セッションID）」をもらっても、その場ですぐポイッと捨ててしまう。
+requests.post(url, data=data) でパスワードを送る ＝ これもまた「はじめましての人」としてアクセスしてしまう。さっきもらったCookieを持っていないので、サーバーから「誰だお前は！」と弾かれてしまう。
+session.get(url) をすると、サーバーからもらった Cookie（セッションID）を自動的に自分のポケット（箱の中）にしまっておいてくれる。
+session.post(url) をするときは、指示しなくても自動的にポケットからさっきのCookieを取り出して、サーバーにスッと差し出してくれ る。
